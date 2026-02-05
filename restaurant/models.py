@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class DishType(models.Model):
@@ -7,13 +8,14 @@ class DishType(models.Model):
     def __str__(self):
         return self.name
 
-class Cook(models.Model):
+class Cook(AbstractUser):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     years_of_experience = models.IntegerField(default=0)
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
