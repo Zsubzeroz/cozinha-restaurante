@@ -1,7 +1,7 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from .models import Dish, DishType, Cook
+from .models import DishType, Dish, Cook
 
 
 
