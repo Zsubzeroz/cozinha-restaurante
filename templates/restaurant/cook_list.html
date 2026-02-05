@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Lista de Cozinheiros{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Nossa Equipe de Cozinheiros</h1>
+
+    {% if cooks %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for cook in cooks %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'restaurant:cook_detail' pk=cook.pk %}">{{ cook.first_name }} {{ cook.last_name }}</a>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ cook.username }}</h6>
+                    <p class="card-text">
+                        Experiência: {{ cook.years_of_experience }} ano(s)
+                    </p>
+                    <p class="card-text small text-truncate">
+                        Pratos Preparados: {{ cook.dishes_prepared.count }}
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Email: {{ cook.email }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        Nenhum cozinheiro cadastrado.
+    </div>
+    {% endif %}
+
+    <a href="{% url 'restaurant:dish_list' %}" class="btn btn-outline-secondary mt-4">Ver Pratos</a>
+</div>
+{% endblock %}

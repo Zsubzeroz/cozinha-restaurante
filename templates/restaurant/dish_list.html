@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Lista de Pratos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Todos os Pratos</h1>
+
+    {% if dishes %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Preço</th>
+                    <th scope="col">Cozinheiros</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dish in dishes %}
+                <tr>
+                    <td><a href="{% url 'restaurant:dish_detail' pk=dish.pk %}">{{ dish.name }}</a></td>
+                    <td>{{ dish.dish_type.name }}</td>
+                    <td>R$ {{ dish.price }}</td>
+                    <td>
+                        {% if dish.cooks.all %}
+                            {{ dish.cooks.count }} Cozinheiro(s)
+                        {% else %}
+                            Nenhum
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        Nenhum prato cadastrado no sistema.
+    </div>
+    {% endif %}
+
+    <a href="{% url 'restaurant:dishtype_list' %}" class="btn btn-outline-secondary mt-3">Ver Tipos de Prato</a>
+</div>
+{% endblock %}

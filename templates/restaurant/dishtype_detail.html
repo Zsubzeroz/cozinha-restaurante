@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ dishtype.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'restaurant:dishtype_list' %}" class="btn btn-outline-primary mb-3">← Voltar para Tipos</a>
+
+    <h1 class="mb-3">{{ dishtype.name }}</h1>
+
+    <h3 class="mt-4">Pratos deste Tipo ({{ dishtype.dishes.count }})</h3>
+
+    {% if dishtype.dishes.all %}
+    <ul class="list-group">
+        {% for dish in dishtype.dishes.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="{% url 'restaurant:dish_detail' pk=dish.pk %}">{{ dish.name }}</a>
+            <span class="badge bg-success rounded-pill">R$ {{ dish.price }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-info mt-3" role="alert">
+        Nenhum prato encontrado para o tipo "{{ dishtype.name }}".
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
