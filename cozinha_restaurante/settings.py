@@ -1,6 +1,5 @@
+from django.conf.urls.static import static
 from pathlib import Path
-
-from django.templatetags import static
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'restaurant',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +85,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = {
+STATICFILES_DIRS = [
     BASE_DIR / 'restaurant' / 'static',
-}
+]
