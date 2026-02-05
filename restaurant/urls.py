@@ -4,6 +4,7 @@ from . import views
 app_name = 'restaurant'
 
 urlpatterns = [
+    path('criar_restaurant/', views.Criar_Restaurant, name='criar_restaurant'),
     # DishType Views
     path('types/', views.DishTypeList.as_view(), name='dishtype_list'),
     path('types/<int:pk>/', views.DishTypeDetail.as_view(), name='dishtype_detail'),

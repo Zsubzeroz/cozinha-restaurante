@@ -86,5 +86,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'restaurant' / 'static',
+    BASE_DIR / 'restaurant' #/ 'static',
 ]
+
+AUTH_USER_MODEL = 'restaurant.Cook'
