@@ -9,11 +9,6 @@ class DishType(models.Model):
         return self.name
 
 class Cook(AbstractUser):
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
     years_of_experience = models.IntegerField(default=0)
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
 
