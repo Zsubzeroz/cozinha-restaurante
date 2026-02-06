@@ -83,7 +83,7 @@ Siga os passos abaixo para configurar o ambiente em sua máquina local:
 <table>
   <tr>
     <td align="center">
-       <img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/a337f0fb-64ac-40ef-a655-032f89fafd1b" />
+       <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/a337f0fb-64ac-40ef-a655-032f89fafd1b" />
         <sub><b>Luan Estifer</b></sub>
       </a>
     </td>
@@ -96,6 +96,7 @@ Siga os passos abaixo para configurar o ambiente em sua máquina local:
 
 
 - **Linkedin:** [Luan Estifer Rodrigues Pereira](https://www.linkedin.com/in/luan-estifer-rodrigues-pereira-7577a2285/)
+
 
 
 
