@@ -84,7 +84,7 @@ Siga os passos abaixo para configurar o ambiente em sua máquina local:
   <tr>
     <td align="center">
       <a href="https://github.com/SEU-GITHUB](https://github.com/Zsubzeroz)">
-        <img src="https://avatars.githubusercontent.com/u/SEU-ID-GITHUB?v=4" width="100px;" alt="Foto do Luan Estifer"/><br>
+        <img src="https://avatars.githubusercontent.com/u/SEU-ID-GITHUB?v=4](https://avatars.githubusercontent.com/u/113989498?v=4&size=64)" width="100px;" alt="Foto do Luan Estifer"/><br>
         <sub><b>Luan Estifer</b></sub>
       </a>
     </td>
@@ -97,3 +97,4 @@ Siga os passos abaixo para configurar o ambiente em sua máquina local:
 
 
 - **Linkedin:** [Luan Estifer Rodrigues Pereira](https://www.linkedin.com/in/luan-estifer-rodrigues-pereira-7577a2285/)
+
