@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Detalhe do Cozinheiro: {{ cook.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'cook_list' %}" class="btn btn-outline-primary mb-3">← Voltar para Cozinheiros</a>
+
+    <h1 class="mb-3">Cozinheiro: {{ cook.username }}</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Informações
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Email:</strong> {{ cook.email }}</li>
+            <li class="list-group-item"><strong>Experiência:</strong> {{ cook.years_of_experience }} anos</li>
+        </ul>
+    </div>
+
+    <h3 class="mt-4">Pratos Preparados ({{ cook.dishes.count }})</h3>
+    {% if cook.dishes.all %}
+    <ul class="list-group list-group-flush">
+        {% for dish in cook.dishes.all %}
+        <li class="list-group-item">{{ dish.name }} ({{ dish.dish_type.name }})</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-info mt-3" role="alert">
+        Nenhum prato designado a este cozinheiro.
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'manage_cooks_action' pk=cook.id action='edit' %}" class="btn btn-warning">Editar</a>
+        <a href="{% url 'manage_cooks_action' pk=cook.id action='delete' %}" class="btn btn-danger" onclick="return confirm('Tem certeza?');">Deletar</a>
+    </div>
+</div>
+{% endblock content %}
