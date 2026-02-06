@@ -9,48 +9,26 @@
           action="{% if editing_dish %}{% url 'manage_dishes_action' pk=editing_dish.pk action='edit' %}{% else %}{% url 'manage_dishes' %}{% endif %}">
         {% csrf_token %}
 
-        <!-- Campos Simples -->
-        <div class="mb-3">
-            <label for="name" class="form-label">Nome do Prato</label>
-            <input type="text" class="form-control" id="name" name="name"
-                   value="{{ editing_dish.name|default_if_none:'' }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Descrição</label>
-            <textarea class="form-control" id="description" name="description" rows="3">{{ editing_dish.description|default_if_none:'' }}</textarea>
-        </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">Preço</label>
-            <input type="number" step="0.01" class="form-control" id="price" name="price"
-                   value="{{ editing_dish.price|default_if_none:'0.00' }}" required>
-        </div>
+
+        {{ form.name.label_tag }}
+        {{ form.name }}
+
+        {{ form.description.label_tag }}
+        {{ form.description }}
+
+        {{ form.price.label_tag }}
+        {{ form.price }}
 
         <!-- ForeignKey: DishType -->
-        <div class="mb-3">
-            <label for="dish_type" class="form-label">Tipo de Prato</label>
-            <select class="form-select" id="dish_type" name="dish_type" required>
-                <option value="">-- Selecione um Tipo --</option>
-                {% for dt in dish_types %}
-                    <option value="{{ dt.id }}" {% if editing_dish and editing_dish.dish_type.id == dt.id %}selected{% endif %}>{{ dt.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+        {{ form.dish_type.label_tag }}
+        {{ form.dish_type }}
 
-        <!-- ManyToManyField: Cooks -->
-        <div class="mb-3">
-            <label for="cooks" class="form-label">Cozinheiros Responsáveis</label>
-            <select class="form-select" id="cooks" name="cooks" multiple>
-                {% for cook in cooks %}
-                    <option value="{{ cook.id }}"
-                            {% if editing_dish and cook in editing_dish.cooks.all %}selected{% endif %}>
-                        {{ cook.username }}
-                    </option>
-                {% endfor %}
-            </select>
-            <div class="form-text">Pressione Ctrl (Windows/Linux) ou Cmd (Mac) para selecionar múltiplos cozinheiros.</div>
-        </div>
 
-        <!-- Botões de Ação -->
+        {{ form.cooks.label_tag }}
+        {{ form.cooks }}
+        <div class="form-text">Pressione Ctrl (Windows/Linux) ou Cmd (Mac) para selecionar múltiplos cozinheiros.</div>
+
+
         {% if editing_dish %}
             <button type="submit" class="btn btn-primary">Atualizar Prato</button>
             <a href="{% url 'dish_list' %}" class="btn btn-secondary">Cancelar Edição</a>
@@ -60,8 +38,6 @@
     </form>
 
     <hr>
-
-    <!-- A listagem será feita no dish_list.html para manter este template focado no formulário -->
     {% if editing_dish %}
         <a href="{% url 'dish_list' %}" class="btn btn-outline-primary mt-3">Voltar para a Lista</a>
     {% endif %}

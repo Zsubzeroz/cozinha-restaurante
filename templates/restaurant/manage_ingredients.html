@@ -8,11 +8,7 @@
     <form method="post"
           action="{% if editing_ingredient %}{% url 'manage_ingredients_action' pk=editing_ingredient.pk action='edit' %}{% else %}{% url 'manage_ingredients' %}{% endif %}">
         {% csrf_token %}
-        <div class="mb-3">
-            <label for="name" class="form-label">Nome do Ingrediente</label>
-            <input type="text" class="form-control" id="name" name="name"
-                   value="{{ editing_ingredient.name|default_if_none:'' }}" required>
-        </div>
+        {{ form.as_p }}
 
         {% if editing_ingredient %}
             <button type="submit" class="btn btn-primary">Atualizar</button>

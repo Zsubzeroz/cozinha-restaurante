@@ -9,32 +9,10 @@
           action="{% if editing_cook %}{% url 'manage_cooks_action' pk=editing_cook.pk action='edit' %}{% else %}{% url 'manage_cooks' %}{% endif %}">
         {% csrf_token %}
 
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username"
-                   value="{{ editing_cook.username|default_if_none:'' }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email"
-                   value="{{ editing_cook.email|default_if_none:'' }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="years_of_experience" class="form-label">Anos de Experiência</label>
-            <input type="number" class="form-control" id="years_of_experience" name="years_of_experience"
-                   value="{{ editing_cook.years_of_experience|default_if_none:'0' }}" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="password" class="form-label">{% if editing_cook %}Nova Senha (Opcional){% else %}Senha{% endif %}</label>
-            <input type="password" class="form-control" id="password" name="password"
-                   {% if not editing_cook %}required{% endif %}>
-            {% if editing_cook %}
-                <p class="form-text text-info">Deixe em branco para manter a senha atual.</p>
-            {% endif %}
-        </div>
+        {{ form.as_p }}
 
         {% if editing_cook %}
+            <p class="form-text text-info">Deixe o campo Senha em branco para manter a senha atual.</p>
             <button type="submit" class="btn btn-primary">Atualizar Cozinheiro</button>
             <a href="{% url 'cook_list' %}" class="btn btn-secondary">Cancelar Edição</a>
         {% else %}
@@ -45,6 +23,7 @@
     <hr>
 
     <h3 class="mt-5">Cozinheiros Cadastrados</h3>
+
     <table class="table table-striped">
         <thead>
             <tr>
