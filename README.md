@@ -83,8 +83,8 @@ Siga os passos abaixo para configurar o ambiente em sua máquina local:
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/SEU-GITHUB](https://github.com/Zsubzeroz)">
-        <img src="https://avatars.githubusercontent.com/u/SEU-ID-GITHUB?v=4](https://avatars.githubusercontent.com/u/113989498?v=4&size=64)" width="100px;" alt="Foto do Luan Estifer"/><br>
+      <a href="[https://github.com/SEU-GITHUB](https://github.com/Zsubzeroz)">
+        <img src="[https://avatars.githubusercontent.com/u/SEU-ID-GITHUB?v=4](https://avatars.githubusercontent.com/u/113989498?v=4&size=64)" width="100px;" alt="Foto do Luan Estifer"/><br>
         <sub><b>Luan Estifer</b></sub>
       </a>
     </td>
