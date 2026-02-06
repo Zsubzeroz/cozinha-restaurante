@@ -3,6 +3,27 @@ from django.urls import reverse
 from .models import DishType, Cook, Dish, Ingredient
 
 
+# --- Views de Detalhe ---
+
+def dish_detail(request, pk):
+    dish = get_object_or_404(Dish, pk=pk)
+    context = {'dish': dish}
+    # Assumindo que o template será 'restaurant/dish_detail.html'
+    return render(request, 'restaurant/dish_detail.html', context)
+
+def dishtype_detail(request, pk):
+    dishtype = get_object_or_404(DishType, pk=pk)
+    context = {'dishtype': dishtype}
+    # Assumindo que o template será 'restaurant/dishtype_detail.html'
+    return render(request, 'restaurant/dishtype_detail.html', context)
+
+def cook_detail(request, pk):
+    cook = get_object_or_404(Cook, pk=pk)
+    context = {'cook': cook}
+    # Assumindo que o template será 'restaurant/cook_detail.html'
+    return render(request, 'restaurant/cook_detail.html', context)
+
+
 # --- Views para DishType (CRUD Completo Implementado) ---
 
 def home(request):
