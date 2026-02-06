@@ -5,6 +5,8 @@
 <div class="container mt-5">
     <h1 class="mb-4">Todos os Pratos</h1>
 
+    <a href="{% url 'manage_dishes' %}" class="btn btn-success mb-3">Adicionar Novo Prato</a>
+
     {% if dishes %}
     <div class="table-responsive">
         <table class="table table-hover table-striped">
@@ -14,12 +16,13 @@
                     <th scope="col">Tipo</th>
                     <th scope="col">Preço</th>
                     <th scope="col">Cozinheiros</th>
+                    <th scope="col">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for dish in dishes %}
                 <tr>
-                    <td><a href="{% url 'restaurant:dish_detail' pk=dish.pk %}">{{ dish.name }}</a></td>
+                    <td>{{ dish.name }}</td>
                     <td>{{ dish.dish_type.name }}</td>
                     <td>R$ {{ dish.price }}</td>
                     <td>
@@ -28,6 +31,10 @@
                         {% else %}
                             Nenhum
                         {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'manage_dishes_action' pk=dish.pk action='edit' %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'manage_dishes_action' pk=dish.pk action='delete' %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar {{ dish.name }}?');">Deletar</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -40,6 +47,6 @@
     </div>
     {% endif %}
 
-    <a href="{% url 'restaurant:dishtype_list' %}" class="btn btn-outline-secondary mt-3">Ver Tipos de Prato</a>
+    <a href="{% url 'manage_dish_types' %}" class="btn btn-outline-secondary mt-3">Gerenciar Tipos de Prato</a>
 </div>
-{% endblock %}
+{% endblock content %}

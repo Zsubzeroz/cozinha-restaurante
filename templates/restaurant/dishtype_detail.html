@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{{ dishtype.name }}{% endblock %}
+{% block title %}Detalhe do Tipo: {{ dishtype.name }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <a href="{% url 'restaurant:dishtype_list' %}" class="btn btn-outline-primary mb-3">← Voltar para Tipos</a>
+    <a href="{% url 'manage_dish_types' %}" class="btn btn-outline-primary mb-3">← Voltar para Gerenciar Tipos</a>
 
     <h1 class="mb-3">{{ dishtype.name }}</h1>
 
@@ -13,8 +13,8 @@
     <ul class="list-group">
         {% for dish in dishtype.dishes.all %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            <a href="{% url 'restaurant:dish_detail' pk=dish.pk %}">{{ dish.name }}</a>
-            <span class="badge bg-success rounded-pill">R$ {{ dish.price }}</span>
+            {{ dish.name }} (R$ {{ dish.price }})
+            <span class="badge bg-success rounded-pill">Cozinheiros: {{ dish.cooks.count }}</span>
         </li>
         {% endfor %}
     </ul>
@@ -23,6 +23,5 @@
         Nenhum prato encontrado para o tipo "{{ dishtype.name }}".
     </div>
     {% endif %}
-
 </div>
-{% endblock %}
+{% endblock content %}

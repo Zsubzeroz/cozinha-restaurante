@@ -1,59 +1,41 @@
 {% extends "base.html" %}
-{% block title %}{{ dish.name }}{% endblock %}
+{% block title %}Detalhe do Prato: {{ dish.name }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <a href="{% url 'restaurant:dish_list' %}" class="btn btn-outline-primary mb-3">← Voltar para Pratos</a>
+    <a href="{% url 'dish_list' %}" class="btn btn-outline-primary mb-3">← Voltar para Pratos</a>
 
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h1 class="card-title mb-0">{{ dish.name }}</h1>
-        </div>
-        <div class="card-body">
-            <h5 class="card-subtitle mb-3 text-muted">Tipo: <a href="{% url 'restaurant:dishtype_detail' pk=dish.dish_type.pk %}">{{ dish.dish_type.name }}</a></h5>
+    <h1 class="mb-3">{{ dish.name }}</h1>
+    <p class="lead text-muted">{{ dish.dish_type.name }}</p>
 
-            <p class="card-text fs-4">Preço: <span class="fw-bold text-success">R$ {{ dish.price }}</span></p>
-
-            {% if dish.description %}
-            <hr>
-            <h6>Descrição:</h6>
-            <p class="card-text">{{ dish.description }}</p>
-            {% endif %}
-
-            <hr>
-
-            <h6 class="mt-3">Cozinheiros Responsáveis ({{ dish.cooks.count }})</h6>
-            {% if dish.cooks.all %}
-            <ul class="list-group list-group-flush">
-                {% for cook in dish.cooks.all %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ cook.first_name }} {{ cook.last_name }}
-                    <a href="{% url 'restaurant:cook_detail' pk=cook.pk %}" class="badge bg-secondary rounded-pill">Ver Perfil</a>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <div class="alert alert-warning" role="alert">
-                Nenhum cozinheiro atribuído a este prato.
-            </div>
-            {% endif %}
-
-        </div>
-    </div>
-
-    <!-- Se implementou a parte opcional (Ingredientes) -->
-    {% if dish.dishingredient_set.all %}
-    <div class="card mt-4">
+    <div class="card mb-4">
         <div class="card-header">
-            Ingredientes
+            Detalhes
         </div>
         <ul class="list-group list-group-flush">
-            {% for item in dish.dishingredient_set.all %}
-            <li class="list-group-item">{{ item.ingredient.name }}: {{ item.quantity }}</li>
-            {% endfor %}
+            <li class="list-group-item"><strong>Preço:</strong> R$ {{ dish.price }}</li>
+            <li class="list-group-item"><strong>Descrição:</strong> {{ dish.description|default:"Nenhuma descrição fornecida." }}</li>
         </ul>
     </div>
-    {% endif %}
 
+    <h3 class="mt-4">Cozinheiros Designados ({{ dish.cooks.count }})</h3>
+    {% if dish.cooks.all %}
+    <ul class="list-group list-group-flush">
+        {% for cook in dish.cooks.all %}
+        <li class="list-group-item">{{ cook.username }} ({{ cook.years_of_experience }} anos)</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        Nenhum cozinheiro designado para este prato.
+    </div>
+    {% endif %}
+    
+    <!-- Aqui você adicionaria a lista de Ingredientes se tivesse implementado DishIngredient -->
+
+    <div class="mt-4">
+        <a href="{% url 'manage_dishes_action' pk=dish.pk action='edit' %}" class="btn btn-warning">Editar Prato</a>
+        <a href="{% url 'manage_dishes_action' pk=dish.pk action='delete' %}" class="btn btn-danger" onclick="return confirm('Tem certeza?');">Deletar Prato</a>
+    </div>
 </div>
-{% endblock %}
+{% endblock content %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %} 
+{% block title %}Gerenciar Tipos de Prato{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">{% if editing_dish_type %}Editar Tipo de Prato{% else %}Adicionar Novo Tipo de Prato{% endif %}</h2>
+
+    <!-- LÓGICA CORRIGIDA DO FORMULÁRIO -->
+    <form method="post"
+          action="{% if editing_dish_type %}{% url 'manage_dish_types_action' pk=editing_dish_type.pk action='edit' %}{% else %}{% url 'manage_dish_types' %}{% endif %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Nome do Tipo de Prato</label>
+            <input type="text" class="form-control" id="name" name="name"
+                   value="{{ editing_dish_type.name|default_if_none:'' }}" required>
+        </div>
+
+        {% if editing_dish_type %}
+            <button type="submit" class="btn btn-primary">Atualizar</button>
+            <a href="{% url 'manage_dish_types' %}" class="btn btn-secondary">Cancelar Edição</a>
+        {% else %}
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        {% endif %}
+    </form>
+
+    <hr>
+
+    <h3 class="mt-5">Tipos de Pratos Cadastrados</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dish_type in dish_types %}
+            <tr>
+                <td>{{ dish_type.id }}</td>
+                <td>{{ dish_type.name }}</td>
+                <td>
+                    <a href="{% url 'manage_dish_types_action' pk=dish_type.id action='edit' %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'manage_dish_types_action' pk=dish_type.id action='delete' %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar {{ dish_type.name }}?');">Deletar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Nenhum tipo de prato cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

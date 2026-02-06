@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Gerenciar Cozinheiros{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">{% if editing_cook %}Editar Cozinheiro{% else %}Adicionar Novo Cozinheiro{% endif %}</h2>
+
+    <form method="post"
+          action="{% if editing_cook %}{% url 'manage_cooks_action' pk=editing_cook.pk action='edit' %}{% else %}{% url 'manage_cooks' %}{% endif %}">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username"
+                   value="{{ editing_cook.username|default_if_none:'' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email"
+                   value="{{ editing_cook.email|default_if_none:'' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="years_of_experience" class="form-label">Anos de Experiência</label>
+            <input type="number" class="form-control" id="years_of_experience" name="years_of_experience"
+                   value="{{ editing_cook.years_of_experience|default_if_none:'0' }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">{% if editing_cook %}Nova Senha (Opcional){% else %}Senha{% endif %}</label>
+            <input type="password" class="form-control" id="password" name="password"
+                   {% if not editing_cook %}required{% endif %}>
+            {% if editing_cook %}
+                <p class="form-text text-info">Deixe em branco para manter a senha atual.</p>
+            {% endif %}
+        </div>
+
+        {% if editing_cook %}
+            <button type="submit" class="btn btn-primary">Atualizar Cozinheiro</button>
+            <a href="{% url 'cook_list' %}" class="btn btn-secondary">Cancelar Edição</a>
+        {% else %}
+            <button type="submit" class="btn btn-primary">Cadastrar Cozinheiro</button>
+        {% endif %}
+    </form>
+
+    <hr>
+
+    <h3 class="mt-5">Cozinheiros Cadastrados</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Experiência (Anos)</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cook in cooks %}
+            <tr>
+                <td>{{ cook.id }}</td>
+                <td>{{ cook.username }}</td>
+                <td>{{ cook.email }}</td>
+                <td>{{ cook.years_of_experience }}</td>
+                <td>
+                    <a href="{% url 'manage_cooks_action' pk=cook.id action='edit' %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'manage_cooks_action' pk=cook.id action='delete' %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar o cozinheiro {{ cook.username }}?');">Deletar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Nenhum cozinheiro cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

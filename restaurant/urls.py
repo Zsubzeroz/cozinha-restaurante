@@ -1,14 +1,25 @@
 from django.urls import path
 from . import views
 
-app_name = 'restaurant'
-
 urlpatterns = [
-    path('types/', views.DishTypeList.as_view(), name='dishtype_list'),
-    path('types/<int:pk>/', views.DishTypeDetail.as_view(), name='dishtype_detail'),
-    path('dishes/', views.DishList.as_view(), name='dish_list'),
-    path('dishes/<int:pk>/', views.DishDetail.as_view(), name='dish_detail'),
-    path('cooks/', views.CookList.as_view(), name='cook_list'),
-    path('cooks/<int:pk>/', views.CookDetail.as_view(), name='cook_detail'),
-    path('types/new/', views.DishTypeCreateView.as_view(), name='dishtype_create'),
+    path('', views.home, name='home'),
+
+    # --- DishType CRUD ---
+    path('dishtype/manage/', views.manage_dish_types, name='manage_dish_types'),
+    path('dishtype/manage/<int:pk>/<str:action>/', views.manage_dish_types, name='manage_dish_types_action'),
+
+    # --- Cook CRUD ---
+    path('cooks/', views.cook_list, name='cook_list'),
+    path('cooks/manage/', views.manage_cooks, name='manage_cooks'),
+    path('cooks/manage/<int:pk>/<str:action>/', views.manage_cooks, name='manage_cooks_action'),
+
+    # --- Ingredient CRUD ---
+    path('ingredients/', views.ingredient_list, name='ingredient_list'),
+    path('ingredients/manage/', views.manage_ingredients, name='manage_ingredients'),
+    path('ingredients/manage/<int:pk>/<str:action>/', views.manage_ingredients, name='manage_ingredients_action'),
+
+    # --- Dish CRUD ---
+    path('dishes/', views.dish_list, name='dish_list'),
+    path('dishes/manage/', views.manage_dishes, name='manage_dishes'),
+    path('dishes/manage/<int:pk>/<str:action>/', views.manage_dishes, name='manage_dishes_action'),
 ]
