@@ -1,54 +1,64 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% block title %}Gerenciar Tipos de Prato{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">{% if editing_dish_type %}Editar Tipo de Prato{% else %}Adicionar Novo Tipo de Prato{% endif %}</h2>
+    <div class="container mt-5">
+        <h2 class="mb-4">{% if editing_dish_type %}Editar Tipo de Prato{% else %}Adicionar Novo Tipo de
+            Prato{% endif %}</h2>
 
-    <form method="post"
-          action="{% if editing_dish_type %}{% url 'manage_dish_types_action' pk=editing_dish_type.pk action='edit' %}{% else %}{% url 'manage_dish_types' %}{% endif %}">
-        {% csrf_token %}
+        <form method="post"
+              action="
+                      {% if editing_dish_type %}{% url 'dish_type_update' pk=editing_dish_type.pk %}{% else %}{% url 'dish_type_create' %}{% endif %}">
+            {% csrf_token %}
 
-        <div class="mb-3">
-            <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
-            {{ form.name }}
-        </div>
+            <div class="mb-3">
+                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                {{ form.name }}
+            </div>
 
-        {% if editing_dish_type %}
-            <button type="submit" class="btn btn-primary">Atualizar</button>
-            <a href="{% url 'manage_dish_types' %}" class="btn btn-secondary">Cancelar Edição</a>
-        {% else %}
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
-        {% endif %}
-    </form>
+            {% if editing_dish_type %}
+                <button type="submit" class="btn btn-primary">Atualizar</button>
+                <a href="{% url 'dish_type_list' %}" class="btn btn-secondary">Cancelar Edição</a>
+            {% else %}
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            {% endif %}
+        </form>
 
-    <hr>
+        <hr>
 
-    <h3 class="mt-5">Tipos de Pratos Cadastrados</h3>
-    <table class="table table-striped">
-        <thead>
+        <h3 class="mt-5">Tipos de Pratos Cadastrados</h3>
+        <table class="table table-striped">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Ações</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for dish_type in dish_types %}
-            <tr>
-                <td>{{ dish_type.id }}</td>
-                <td>{{ dish_type.name }}</td>
-                <td>
-                    <a href="{% url 'manage_dish_types_action' pk=dish_type.id action='edit' %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'manage_dish_types_action' pk=dish_type.id action='delete' %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar {{ dish_type.name }}?');">Deletar</a>
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ dish_type.id }}</td>
+                    <td>{{ dish_type.name }}</td>
+                    <td>
+                        <a href="{% url 'dish_type_update' pk=dish_type.id %}" class="btn btn-sm btn-warning">Editar</a>
+
+                        <form method="POST" action="{% url 'dish_type_delete' pk=dish_type.id %}"
+                              style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Tem certeza que deseja deletar {{ dish_type.name }}?');">
+                                Deletar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
             {% empty %}
-            <tr>
-                <td colspan="3">Nenhum tipo de prato cadastrado.</td>
-            </tr>
+                <tr>
+                    <td colspan="3">Nenhum tipo de prato cadastrado.</td>
+                </tr>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}

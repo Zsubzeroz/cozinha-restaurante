@@ -3,174 +3,144 @@ from .models import DishType, Cook, Dish, Ingredient
 from .forms import DishTypeForm, CookForm, IngredientForm, DishForm
 
 
+def home(request):
+    return redirect('dish_type_list')
+
+
 def dish_detail(request, pk):
     dish = get_object_or_404(Dish, pk=pk)
-    context = {'dish': dish}
-    return render(request, 'restaurant/dish_detail.html', context)
+    return render(request, 'restaurant/dish_detail.html', {'dish': dish})
 
 
 def dishtype_detail(request, pk):
     dishtype = get_object_or_404(DishType, pk=pk)
-    context = {'dishtype': dishtype}
-    return render(request, 'restaurant/dishtype_detail.html', context)
+    return render(request, 'restaurant/dishtype_detail.html', {'dishtype': dishtype})
 
 
 def cook_detail(request, pk):
     cook = get_object_or_404(Cook, pk=pk)
-    context = {'cook': cook}
-    return render(request, 'restaurant/cook_detail.html', context)
+    return render(request, 'restaurant/cook_detail.html', {'cook': cook})
 
 
-
-def home(request):
-    return redirect('manage_dish_types')
-
-
-def manage_dish_types(request, pk=None, action=None):
-    dish_type_instance = None
-
-    if pk:
-        dish_type_instance = get_object_or_404(DishType, pk=pk)
-
-    if request.method == 'POST':
-        form = DishTypeForm(request.POST, instance=dish_type_instance)
-        if form.is_valid():
-            form.save()
-            return redirect('manage_dish_types')
-
-    elif action == 'delete' and pk:
-        dish_type_instance.delete()
-        return redirect('manage_dish_types')
-
+def dish_type_list(request):
     dish_types = DishType.objects.all()
-    form = DishTypeForm(instance=dish_type_instance)
-
+    form = DishTypeForm()
     context = {
         'dish_types': dish_types,
-        'editing_dish_type': dish_type_instance if pk and action == 'edit' else None,
-        'form': form
+        'form': form,
+        'editing_dish_type': None
     }
     return render(request, 'restaurant/manage_dish_types.html', context)
 
 
+def dish_type_create(request):
+    if request.method == 'POST':
+        form = DishTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+    return redirect('dish_type_list')
+
+
+def dish_type_update(request, pk):
+    instance = get_object_or_404(DishType, pk=pk)
+    if request.method == 'POST':
+        form = DishTypeForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('dish_type_list')
+    else:
+        form = DishTypeForm(instance=instance)
+    context = {
+        'dish_types': DishType.objects.all(),
+        'form': form,
+        'editing_dish_type': instance
+    }
+    return render(request, 'restaurant/manage_dish_types.html', context)
+
+
+def dish_type_delete(request, pk):
+    instance = get_object_or_404(DishType, pk=pk)
+    if request.method == 'POST':
+        instance.delete()
+    return redirect('dish_type_list')
+
 
 def cook_list(request):
-    cooks = Cook.objects.all()
-    context = {'cooks': cooks}
-    return render(request, 'restaurant/cook_list.html', context)
+    return render(request, 'restaurant/cook_list.html', {'cooks': Cook.objects.all()})
 
 
 def manage_cooks(request, pk=None, action=None):
-    cook_instance = None
-
-    if pk:
-        cook_instance = get_object_or_404(Cook, pk=pk)
-
+    instance = get_object_or_404(Cook, pk=pk) if pk else None
     if request.method == 'POST':
-        form = CookForm(request.POST, instance=cook_instance)
-
+        form = CookForm(request.POST, instance=instance)
         if form.is_valid():
-            if pk and action == 'edit':  # UPDATE
-                cook_instance = form.save(commit=False)
-
+            if pk and action == 'edit':
+                cook = form.save(commit=False)
                 password = form.cleaned_data.get('password')
                 if password:
-                    cook_instance.set_password(password)
-
-                cook_instance.save()
-                return redirect('cook_list')
-
-            elif not pk:  # CREATE
-                user = Cook.objects.create_user(
+                    cook.set_password(password)
+                cook.save()
+                form.save_m2m()
+            elif not pk:
+                Cook.objects.create_user(
                     username=form.cleaned_data['username'],
                     email=form.cleaned_data['email'],
                     password=form.cleaned_data['password'],
                     years_of_experience=form.cleaned_data['years_of_experience']
                 )
-                return redirect('cook_list')
-
+            return redirect('cook_list')
     if action == 'delete' and pk:
-        cook_instance.delete()
+        instance.delete()
         return redirect('cook_list')
-
-    form = CookForm(instance=cook_instance)
-    cooks = Cook.objects.all()
-
     context = {
-        'cooks': cooks,
-        'editing_cook': cook_instance if pk and action == 'edit' else None,
-        'form': form
+        'cooks': Cook.objects.all(),
+        'editing_cook': instance if pk and action == 'edit' else None,
+        'form': CookForm(instance=instance)
     }
     return render(request, 'restaurant/manage_cooks.html', context)
 
 
-
 def ingredient_list(request):
-    ingredients = Ingredient.objects.all()
-    context = {'ingredients': ingredients}
-    return render(request, 'restaurant/ingredient_list.html', context)
+    return render(request, 'restaurant/ingredient_list.html', {'ingredients': Ingredient.objects.all()})
 
 
 def manage_ingredients(request, pk=None, action=None):
-    ingredient_instance = None
-
-    if pk:
-        ingredient_instance = get_object_or_404(Ingredient, pk=pk)
-
+    instance = get_object_or_404(Ingredient, pk=pk) if pk else None
     if request.method == 'POST':
-        form = IngredientForm(request.POST, instance=ingredient_instance)
+        form = IngredientForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
             return redirect('ingredient_list')
-
     if action == 'delete' and pk:
-        ingredient_instance.delete()
+        instance.delete()
         return redirect('ingredient_list')
-
-    ingredients = Ingredient.objects.all()
-    form = IngredientForm(instance=ingredient_instance)
-
     context = {
-        'ingredients': ingredients,
-        'editing_ingredient': ingredient_instance if pk and action == 'edit' else None,
-        'form': form
+        'ingredients': Ingredient.objects.all(),
+        'editing_ingredient': instance if pk and action == 'edit' else None,
+        'form': IngredientForm(instance=instance)
     }
     return render(request, 'restaurant/manage_ingredients.html', context)
 
 
-
 def dish_list(request):
-    dishes = Dish.objects.all()
-    context = {'dishes': dishes}
-    return render(request, 'restaurant/dish_list.html', context)
+    return render(request, 'restaurant/dish_list.html', {'dishes': Dish.objects.all()})
 
 
 def manage_dishes(request, pk=None, action=None):
-    dish_instance = None
-
-    if pk:
-        dish_instance = get_object_or_404(Dish, pk=pk)
-
+    instance = get_object_or_404(Dish, pk=pk) if pk else None
     if request.method == 'POST':
-        form = DishForm(request.POST, instance=dish_instance)
+        form = DishForm(request.POST, instance=instance)
         if form.is_valid():
-            dish_instance = form.save()
+            form.save()
             return redirect('dish_list')
-
     if action == 'delete' and pk:
-        dish_instance.delete()
+        instance.delete()
         return redirect('dish_list')
-
-    dish_types = DishType.objects.all()
-    cooks = Cook.objects.all()
-
-    form = DishForm(instance=dish_instance)
-
     context = {
         'dishes': Dish.objects.all(),
-        'dish_types': dish_types,
-        'cooks': cooks,
-        'editing_dish': dish_instance if pk and action == 'edit' else None,
-        'form': form
+        'dish_types': DishType.objects.all(),
+        'cooks': Cook.objects.all(),
+        'editing_dish': instance if pk and action == 'edit' else None,
+        'form': DishForm(instance=instance)
     }
     return render(request, 'restaurant/manage_dishes.html', context)
