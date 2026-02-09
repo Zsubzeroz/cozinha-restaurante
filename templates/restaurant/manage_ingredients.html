@@ -2,49 +2,60 @@
 {% block title %}Gerenciar Ingredientes{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">{% if editing_ingredient %}Editar Ingrediente{% else %}Adicionar Novo Ingrediente{% endif %}</h2>
+    <div class="container mt-5">
+        <h2 class="mb-4">{% if editing_ingredient %}Editar Ingrediente{% else %}Adicionar Novo
+            Ingrediente{% endif %}</h2>
 
-    <form method="post"
-          action="{% if editing_ingredient %}{% url 'manage_ingredients_action' pk=editing_ingredient.pk action='edit' %}{% else %}{% url 'manage_ingredients' %}{% endif %}">
-        {% csrf_token %}
-        {{ form.as_p }}
+        <form method="post"
+              action="
+                      {% if editing_ingredient %}{% url 'ingredient_update' pk=editing_ingredient.pk %}{% else %}{% url 'ingredient_create' %}{% endif %}">
+            {% csrf_token %}
 
-        {% if editing_ingredient %}
-            <button type="submit" class="btn btn-primary">Atualizar</button>
-            <a href="{% url 'ingredient_list' %}" class="btn btn-secondary">Cancelar Edição</a>
-        {% else %}
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
-        {% endif %}
-    </form>
+            {{ form.as_p }}
 
-    <hr>
+            {% if editing_ingredient %}
+                <button type="submit" class="btn btn-primary">Atualizar</button>
+                <a href="{% url 'ingredient_list' %}" class="btn btn-secondary">Cancelar Edição</a>
+            {% else %}
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            {% endif %}
+        </form>
 
-    <h3 class="mt-5">Ingredientes Cadastrados</h3>
-    <table class="table table-striped">
-        <thead>
+        <hr>
+
+        <h3 class="mt-5">Ingredientes Cadastrados</h3>
+        <table class="table table-striped">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Ações</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for ingredient in ingredients %}
-            <tr>
-                <td>{{ ingredient.id }}</td>
-                <td>{{ ingredient.name }}</td>
-                <td>
-                    <a href="{% url 'manage_ingredients_action' pk=ingredient.id action='edit' %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'manage_ingredients_action' pk=ingredient.id action='delete' %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar {{ ingredient.name }}?');">Deletar</a>
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ ingredient.id }}</td>
+                    <td>{{ ingredient.name }}</td>
+                    <td>
+                        <a href="{% url 'ingredient_update' pk=ingredient.id %}"
+                           class="btn btn-sm btn-warning">Editar</a>
+                        <form method="POST" action="{% url 'ingredient_delete' pk=ingredient.id %}"
+                              style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Tem certeza que deseja deletar {{ ingredient.name }}?');">
+                                Deletar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
             {% empty %}
-            <tr>
-                <td colspan="3">Nenhum ingrediente cadastrado.</td>
-            </tr>
+                <tr>
+                    <td colspan="3">Nenhum ingrediente cadastrado.</td>
+                </tr>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}

@@ -2,12 +2,12 @@
 {% block title %}Lista de Cozinheiros{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">Cozinheiros</h2>
-    <a href="{% url 'manage_cooks' %}" class="btn btn-success mb-3">Adicionar Novo Cozinheiro</a>
+    <div class="container mt-5">
+        <h2 class="mb-4">Cozinheiros Cadastrados</h2>
+        <a href="{% url 'cook_create' %}" class="btn btn-success mb-3">Adicionar Novo Cozinheiro</a>
 
-    <table class="table table-striped">
-        <thead>
+        <table class="table table-striped">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Username</th>
@@ -15,25 +15,32 @@
                 <th>Experiência (Anos)</th>
                 <th>Ações</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for cook in cooks %}
-            <tr>
-                <td>{{ cook.id }}</td>
-                <td>{{ cook.username }}</td>
-                <td>{{ cook.email }}</td>
-                <td>{{ cook.years_of_experience }}</td>
-                <td>
-                    <a href="{% url 'manage_cooks_action' pk=cook.id action='edit' %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'manage_cooks_action' pk=cook.id action='delete' %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar o cozinheiro {{ cook.username }}?');">Deletar</a>
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ cook.id }}</td>
+                    <td>{{ cook.username }}</td>
+                    <td>{{ cook.email }}</td>
+                    <td>{{ cook.years_of_experience }}</td>
+                    <td>
+                        <a href="{% url 'cook_update' pk=cook.id %}" class="btn btn-sm btn-warning">Editar</a>
+
+                        <form method="POST" action="{% url 'cook_delete' pk=cook.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Tem certeza que deseja deletar o cozinheiro {{ cook.username }}?');">
+                                Deletar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
             {% empty %}
-            <tr>
-                <td colspan="5">Nenhum cozinheiro cadastrado.</td>
-            </tr>
+                <tr>
+                    <td colspan="5">Nenhum cozinheiro cadastrado.</td>
+                </tr>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}

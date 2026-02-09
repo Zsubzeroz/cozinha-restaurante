@@ -7,7 +7,6 @@ class DishTypeForm(forms.ModelForm):
         fields = ['name']
 
 class CookForm(forms.ModelForm):
-
     password = forms.CharField(widget=forms.PasswordInput, required=False)
 
     class Meta:

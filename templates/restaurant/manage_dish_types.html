@@ -41,6 +41,7 @@
                     <td>{{ dish_type.id }}</td>
                     <td>{{ dish_type.name }}</td>
                     <td>
+
                         <a href="{% url 'dish_type_update' pk=dish_type.id %}" class="btn btn-sm btn-warning">Editar</a>
 
                         <form method="POST" action="{% url 'dish_type_delete' pk=dish_type.id %}"

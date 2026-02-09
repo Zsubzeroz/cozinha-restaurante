@@ -2,44 +2,28 @@
 {% block title %}Gerenciar Pratos{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">{% if editing_dish %}Editar Prato: {{ editing_dish.name }}{% else %}Adicionar Novo Prato{% endif %}</h2>
+    <div class="container mt-5">
+        <h2 class="mb-4">{% if editing_dish %}Editar Prato: {{ editing_dish.name }}{% else %}Adicionar Novo
+            Prato{% endif %}</h2>
 
-    <form method="post"
-          action="{% if editing_dish %}{% url 'manage_dishes_action' pk=editing_dish.pk action='edit' %}{% else %}{% url 'manage_dishes' %}{% endif %}">
-        {% csrf_token %}
+        <form method="post"
+              action="
+                      {% if editing_dish %}{% url 'dish_update' pk=editing_dish.pk %}{% else %}{% url 'dish_create' %}{% endif %}">
+            {% csrf_token %}
 
+            {{ form.as_p }}
 
-        {{ form.name.label_tag }}
-        {{ form.name }}
+            {% if editing_dish %}
+                <button type="submit" class="btn btn-primary">Atualizar Prato</button>
+                <a href="{% url 'dish_list' %}" class="btn btn-secondary">Cancelar Edição</a>
+            {% else %}
+                <button type="submit" class="btn btn-primary">Cadastrar Prato</button>
+            {% endif %}
+        </form>
 
-        {{ form.description.label_tag }}
-        {{ form.description }}
-
-        {{ form.price.label_tag }}
-        {{ form.price }}
-
-        <!-- ForeignKey: DishType -->
-        {{ form.dish_type.label_tag }}
-        {{ form.dish_type }}
-
-
-        {{ form.cooks.label_tag }}
-        {{ form.cooks }}
-        <div class="form-text">Pressione Ctrl (Windows/Linux) ou Cmd (Mac) para selecionar múltiplos cozinheiros.</div>
-
-
+        <hr>
         {% if editing_dish %}
-            <button type="submit" class="btn btn-primary">Atualizar Prato</button>
-            <a href="{% url 'dish_list' %}" class="btn btn-secondary">Cancelar Edição</a>
-        {% else %}
-            <button type="submit" class="btn btn-primary">Cadastrar Prato</button>
+            <a href="{% url 'dish_list' %}" class="btn btn-outline-primary mt-3">Voltar para a Lista</a>
         {% endif %}
-    </form>
-
-    <hr>
-    {% if editing_dish %}
-        <a href="{% url 'dish_list' %}" class="btn btn-outline-primary mt-3">Voltar para a Lista</a>
-    {% endif %}
-</div>
+    </div>
 {% endblock content %}

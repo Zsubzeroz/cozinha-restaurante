@@ -2,30 +2,30 @@
 {% block title %}Gerenciar Cozinheiros{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">{% if editing_cook %}Editar Cozinheiro{% else %}Adicionar Novo Cozinheiro{% endif %}</h2>
+    <div class="container mt-5">
+        <h2 class="mb-4">{% if editing_cook %}Editar Cozinheiro{% else %}Adicionar Novo Cozinheiro{% endif %}</h2>
 
-    <form method="post"
-          action="{% if editing_cook %}{% url 'manage_cooks_action' pk=editing_cook.pk action='edit' %}{% else %}{% url 'manage_cooks' %}{% endif %}">
-        {% csrf_token %}
+        <form method="post"
+              action="
+                      {% if editing_cook %}{% url 'cook_update' pk=editing_cook.pk %}{% else %}{% url 'cook_create' %}{% endif %}">
+            {% csrf_token %}
 
-        {{ form.as_p }}
+            {{ form.as_p }}
 
-        {% if editing_cook %}
-            <p class="form-text text-info">Deixe o campo Senha em branco para manter a senha atual.</p>
-            <button type="submit" class="btn btn-primary">Atualizar Cozinheiro</button>
-            <a href="{% url 'cook_list' %}" class="btn btn-secondary">Cancelar Edição</a>
-        {% else %}
-            <button type="submit" class="btn btn-primary">Cadastrar Cozinheiro</button>
-        {% endif %}
-    </form>
+            {% if editing_cook %}
+                <p class="form-text text-info">Deixe o campo Senha em branco para manter a senha atual.</p>
+                <button type="submit" class="btn btn-primary">Atualizar Cozinheiro</button>
+                <a href="{% url 'cook_list' %}" class="btn btn-secondary">Cancelar Edição</a>
+            {% else %}
+                <button type="submit" class="btn btn-primary">Cadastrar Cozinheiro</button>
+            {% endif %}
+        </form>
 
-    <hr>
+        <hr>
 
-    <h3 class="mt-5">Cozinheiros Cadastrados</h3>
-
-    <table class="table table-striped">
-        <thead>
+        <h3 class="mt-5">Cozinheiros Cadastrados</h3>
+        <table class="table table-striped">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Username</th>
@@ -33,25 +33,32 @@
                 <th>Experiência (Anos)</th>
                 <th>Ações</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for cook in cooks %}
-            <tr>
-                <td>{{ cook.id }}</td>
-                <td>{{ cook.username }}</td>
-                <td>{{ cook.email }}</td>
-                <td>{{ cook.years_of_experience }}</td>
-                <td>
-                    <a href="{% url 'manage_cooks_action' pk=cook.id action='edit' %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'manage_cooks_action' pk=cook.id action='delete' %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja deletar o cozinheiro {{ cook.username }}?');">Deletar</a>
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ cook.id }}</td>
+                    <td>{{ cook.username }}</td>
+                    <td>{{ cook.email }}</td>
+                    <td>{{ cook.years_of_experience }}</td>
+                    <td>
+                        <a href="{% url 'cook_update' pk=cook.id %}" class="btn btn-sm btn-warning">Editar</a>
+
+                        <form method="POST" action="{% url 'cook_delete' pk=cook.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Tem certeza que deseja deletar o cozinheiro {{ cook.username }}?');">
+                                Deletar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
             {% empty %}
-            <tr>
-                <td colspan="5">Nenhum cozinheiro cadastrado.</td>
-            </tr>
+                <tr>
+                    <td colspan="5">Nenhum cozinheiro cadastrado.</td>
+                </tr>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}
