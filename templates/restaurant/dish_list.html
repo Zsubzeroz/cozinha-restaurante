@@ -4,7 +4,7 @@
 {% block content %}
     <div class="container mt-5">
         <h1 class="mb-4">Todos os Pratos</h1>
-        <a href="{% url 'manage_dishes' %}" class="btn btn-success mb-3">Adicionar Novo Prato</a>
+        <a href="{% url 'dish_create' %}" class="btn btn-success mb-3">Adicionar Novo Prato</a>
         {% if dishes %}
             <div class="table-responsive">
                 <table class="table table-hover table-striped">
