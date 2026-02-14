@@ -1,64 +1,165 @@
 {% extends "base.html" %}
-{% block title %}Gerenciar Cozinheiros{% endblock %}
+
+{% block title %}
+    {% if editing_cook %}Editar Cozinheiro{% else %}Novo Cozinheiro{% endif %}
+{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="mb-4">{% if editing_cook %}Editar Cozinheiro{% else %}Adicionar Novo Cozinheiro{% endif %}</h2>
 
-        <form method="post"
-              action="
-                      {% if editing_cook %}{% url 'cook_update' pk=editing_cook.pk %}{% else %}{% url 'cook_create' %}{% endif %}">
-            {% csrf_token %}
+    <style>
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+        }
 
-            {{ form.as_p }}
+        .form-title {
+            color: var(--sidebar-bg);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
 
-            {% if editing_cook %}
-                <p class="form-text text-info">Deixe o campo Senha em branco para manter a senha atual.</p>
-                <button type="submit" class="btn btn-primary">Atualizar Cozinheiro</button>
-                <a href="{% url 'cook_list' %}" class="btn btn-secondary">Cancelar Edição</a>
-            {% else %}
-                <button type="submit" class="btn btn-primary">Cadastrar Cozinheiro</button>
-            {% endif %}
-        </form>
+        .form-label-custom {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
 
-        <hr>
+        .btn-submit-custom {
+            background-color: var(--accent-yellow);
+            color: #000;
+            font-weight: 600;
+            border: none;
+            padding: 0.75rem;
+            transition: all 0.2s;
+        }
 
-        <h3 class="mt-5">Cozinheiros Cadastrados</h3>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Experiência (Anos)</th>
-                <th>Ações</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for cook in cooks %}
-                <tr>
-                    <td>{{ cook.id }}</td>
-                    <td>{{ cook.username }}</td>
-                    <td>{{ cook.email }}</td>
-                    <td>{{ cook.years_of_experience }}</td>
-                    <td>
-                        <a href="{% url 'cook_update' pk=cook.id %}" class="btn btn-sm btn-warning">Editar</a>
+        .btn-submit-custom:hover {
+            background-color: #e0ac46;
+            transform: translateY(-1px);
+        }
 
-                        <form method="POST" action="{% url 'cook_delete' pk=cook.id %}" style="display:inline;">
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: var(--sidebar-bg);
+        }
+    </style>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-7 col-md-9">
+
+                <div class="dashboard-card overflow-hidden">
+
+                    <div class="p-4 border-bottom bg-white">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 50px; height: 50px; background-color: var(--sidebar-bg); color: var(--accent-yellow);">
+                                <i class="fas {% if editing_cook %}fa-user-pen{% else %}fa-user-plus{% endif %} fa-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-uppercase text-muted mb-1"
+                                    style="font-size: 0.75rem; letter-spacing: 1px;">Gestão de Staff</h6>
+                                <h2 class="form-title h4 mb-0">
+                                    {% if editing_cook %}Editar Perfil{% else %}Cadastrar Cozinheiro{% endif %}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 p-md-5">
+                        <form method="post" action="
+                                {% if editing_cook %}{% url 'cook_update' pk=editing_cook.pk %}{% else %}{% url 'cook_create' %}{% endif %}"
+                              enctype="multipart/form-data">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Tem certeza que deseja deletar o cozinheiro {{ cook.username }}?');">
-                                Deletar
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger d-flex align-items-center shadow-sm border-0 mb-4"
+                                     role="alert">
+                                    <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+                                    <div>{{ form.non_field_errors }}</div>
+                                </div>
+                            {% endif %}
+
+                            {% for field in form %}
+                                <div class="mb-4">
+                                    <label class="form-label-custom" for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+                                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                    </label>
+
+                                    <div class="input-group">
+                                        {{ field }}
+                                    </div>
+
+                                    {% if field.help_text %}
+                                        <div class="form-text text-muted small mt-1">
+                                            <i class="fas fa-info-circle me-1"></i> {{ field.help_text }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-2 fw-bold">
+                                            {% for error in field.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            {% if editing_cook %}
+                                <div class="alert alert-light border border-info d-flex align-items-center p-3 mb-4 rounded-2"
+                                     role="alert">
+                                    <i class="fas fa-key text-info me-3 fs-4"></i>
+                                    <div>
+                                        <strong class="d-block text-dark">Alteração de Senha</strong>
+                                        <span class="small text-muted">Deixe o campo de senha vazio se desejar manter a senha atual.</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="d-grid gap-3 mt-5">
+                                <button type="submit" class="btn btn-submit-custom shadow-sm text-uppercase">
+                                    {% if editing_cook %}
+                                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                                    {% else %}
+                                        <i class="fas fa-check me-2"></i>Confirmar Cadastro
+                                    {% endif %}
                             </button>
+
+                                <a href="{% url 'cook_list' %}"
+                                   class="btn btn-link text-decoration-none text-muted text-center"
+                                   style="font-size: 0.9rem;">
+                                    Cancelar e Voltar
+                                </a>
+                            </div>
                         </form>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5">Nenhum cozinheiro cadastrado.</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var formFields = document.querySelectorAll('input, select, textarea');
+
+            formFields.forEach(function (field) {
+                if (field.type !== 'checkbox' && field.type !== 'radio' && field.type !== 'submit' && field.type !== 'hidden') {
+                    field.classList.add('form-control');
+                    field.classList.add('bg-light');
+                    field.style.border = '1px solid #dee2e6';
+                    field.style.padding = '0.6rem 1rem';
+                } else if (field.type === 'checkbox') {
+                    field.classList.add('form-check-input');
+                }
+            });
+        });
+    </script>
 {% endblock content %}

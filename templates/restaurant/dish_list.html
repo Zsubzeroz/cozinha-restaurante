@@ -1,55 +1,338 @@
 {% extends "base.html" %}
-{% block title %}Lista de Pratos{% endblock %}
+{% block title %}Gerenciamento de Pratos{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1 class="mb-4">Todos os Pratos</h1>
-        <a href="{% url 'dish_create' %}" class="btn btn-success mb-3">Adicionar Novo Prato</a>
-        {% if dishes %}
+
+    <style>
+        :root {
+            --primary-dark: #0e2e3b;
+            --accent-yellow: #fcc14f;
+            --bg-light: #f4f6f8;
+            --text-dark: #333333;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 100%;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0;
+        }
+
+        .white-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .filter-bar {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #fff;
+        }
+
+        .search-input-group .form-control {
+            background-color: #f8f9fa;
+            border: none;
+            padding-left: 2.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+        }
+
+        .custom-select {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .btn-new-item {
+            background-color: var(--accent-yellow);
+            color: #000;
+            font-weight: 600;
+            border: none;
+            padding: 0.5rem 1.2rem;
+        }
+
+        .btn-new-item:hover {
+            background-color: #e0ac46;
+        }
+
+        .active-filters {
+            padding: 0.75rem 1.5rem;
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .filter-tag {
+            background-color: #e9ecef;
+            padding: 2px 10px;
+            border-radius: 4px;
+            color: var(--text-dark);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .filter-tag i {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .table-custom {
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .table-custom thead th {
+            background-color: var(--primary-dark);
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            border: none;
+            padding: 1rem;
+            white-space: nowrap;
+        }
+
+        .table-custom tbody td {
+            background-color: white;
+            color: var(--text-dark);
+            vertical-align: middle;
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+
+        .table-custom tbody tr:hover td {
+            background-color: #f8f9fa;
+        }
+
+        .action-btn {
+            color: var(--primary-dark);
+            background: transparent;
+            border: none;
+            margin: 0 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .action-btn:hover {
+            color: var(--accent-yellow);
+        }
+
+        .action-btn.delete:hover {
+            color: #dc3545;
+        }
+
+        .text-muted-small {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            background: #eef2f5;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .pagination-footer {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+    </style>
+
+    <div class="dashboard-container">
+
+        <div class="mb-4">
+            <h1 class="page-title">Pratos</h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Gerencie o menu do restaurante</p>
+        </div>
+
+        <div class="white-card">
+
+            <form method="GET" action="."
+                  class="filter-bar d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+                <div class="d-flex align-items-center gap-3 flex-grow-1">
+                    <span class="fw-bold fs-5 me-2">Menu</span>
+
+                    <div class="position-relative search-input-group" style="width: 300px;">
+                        <button type="submit" class="btn p-0 border-0 position-absolute"
+                                style="left: 10px; top: 50%; transform: translateY(-50%); background: transparent; z-index: 10;">
+                            <i class="fas fa-search search-icon text-muted"></i>
+                        </button>
+                        <input type="text"
+                               name="search"
+                               class="form-control rounded-pill"
+                               placeholder="Buscar prato..."
+                               value="{{ search_query }}"
+                               style="padding-left: 2.5rem;">
+                    </div>
+
+                    <select name="category" class="form-select custom-select rounded-1 w-auto d-none d-md-block"
+                            onchange="this.form.submit()">
+                        <option value="">Todas as Categorias</option>
+                        {% for type in dish_types %}
+                            <option value="{{ type.id }}" {% if selected_category == type.id %}selected{% endif %}>
+                                {{ type.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="sort" class="form-select custom-select rounded-1 w-auto d-none d-md-block"
+                            onchange="this.form.submit()">
+                        <option value="">Ordenar Preço</option>
+                        <option value="asc" {% if selected_sort == 'asc' %}selected{% endif %}>Menor Preço</option>
+                        <option value="desc" {% if selected_sort == 'desc' %}selected{% endif %}>Maior Preço</option>
+                    </select>
+
+                    {% if search_query or selected_category or selected_sort %}
+                        <a href="." class="text-decoration-none text-muted small ms-2"><i class="fas fa-times"></i>
+                            Limpar</a>
+                    {% endif %}
+                </div>
+
+                <a href="{% url 'dish_create' %}" class="btn btn-new-item rounded-1 shadow-sm">
+                    <i class="fas fa-plus me-1" style="font-size: 0.8em;"></i> Novo prato
+                </a>
+            </form>
+
             <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead class="table-dark">
+                <table class="table table-custom">
+                    <thead>
                     <tr>
-                        <th scope="col">Nome</th>
-                        <th scope="col">Tipo</th>
+                        <th scope="col">Prato <i class="fas fa-chevron-down ms-1 small"></i></th>
+                        <th scope="col">Categoria <i class="fas fa-chevron-down ms-1 small"></i></th>
                         <th scope="col">Preço</th>
-                        <th scope="col">Cozinheiros</th>
-                        <th scope="col">Ações</th>
+                        <th scope="col">Staff (Cozinha) <i class="fas fa-chevron-down ms-1 small"></i></th>
+                        <th scope="col">Ingredientes Principais <i class="fas fa-chevron-down ms-1 small"></i></th>
+                        <th scope="col" class="text-center">Ações</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for dish in dishes %}
                         <tr>
-                            <td>{{ dish.name }}</td>
+                            <td class="fw-bold text-primary" style="color: #3b6b94 !important;">{{ dish.name }}</td>
+
                             <td>{{ dish.dish_type.name }}</td>
-                            <td>R$ {{ dish.price }}</td>
+
+                            <td class="font-monospace text-muted">R$ {{ dish.price }}</td>
+
                             <td>
                                 {% if dish.cooks.all %}
-                                    {{ dish.cooks.count }} Cozinheiro(s)
+                                    <span class="status-badge">{{ dish.cooks.count }} chefs</span>
                                 {% else %}
-                                    Nenhum
+                                    <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
-                            <td>
-                                <a href="{% url 'dish_update' pk=dish.pk %}" class="btn btn-sm btn-warning">Editar</a>
+
+                            <td style="max-width: 250px;">
+                                <div class="text-truncate text-muted-small"
+                                     title="{{ dish.ingredients.all|join:', ' }}">
+                                    {{ dish.ingredients.all|join:", "|default:"Não listado" }}
+                                </div>
+                            </td>
+
+                            <td class="text-center">
+
+                                <a href="{% url 'dish_update' pk=dish.pk %}" class="action-btn" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+
                                 <form method="POST" action="{% url 'dish_delete' pk=dish.pk %}" style="display:inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Tem certeza que deseja deletar {{ dish.name }}?');">
-                                        Deletar
+                                    <button type="submit" class="action-btn delete"
+                                            onclick="return confirm('Tem certeza que deseja deletar {{ dish.name }}?');"
+                                            title="Excluir">
+                                        <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="opacity-50">
+                                    <i class="fas fa-utensils fa-3x mb-3"></i>
+                                    <p>Nenhum prato encontrado.</p>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
-        {% else %}
-            <div class="alert alert-warning" role="alert">
-                Nenhum prato cadastrado no sistema.
+
+            <div class="pagination-footer">
+                <div class="d-flex align-items-center gap-2">
+                    <span>Linhas por página</span>
+                    <select class="form-select form-select-sm w-auto border-0 bg-light">
+                        <option>10</option>
+                        <option>20</option>
+                        <option>50</option>
+                    </select>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <a href="#" class="text-decoration-none text-muted">< Anterior</a>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary border-0 fw-bold text-dark">1</button>
+                        <button class="btn btn-sm btn-outline-secondary border-0">2</button>
+                        <button class="btn btn-sm btn-outline-secondary border-0">3</button>
+                        <span class="text-muted">...</span>
+                        <button class="btn btn-sm btn-outline-secondary border-0">10</button>
+                    </div>
+                    <a href="#" class="text-decoration-none text-muted">Próximo ></a>
+                </div>
+
+                <div class="text-muted small">
+                    Exibindo {{ dishes|length }} registros
+                </div>
             </div>
-        {% endif %}
-        <a href="{% url 'dish_type_list' %}" class="btn btn-outline-secondary mt-3">Gerenciar Tipos de Prato</a>
+
+        </div>
+
+        <div class="d-flex justify-content-end gap-3">
+            <a href="{% url 'dish_type_list' %}" class="btn btn-link text-decoration-none text-secondary">
+                <i class="fas fa-mortar-pestle"></i> Configurar Tipos de Prato
+            </a>
+            <a href="{% url 'ingredient_list' %}" class="btn btn-link text-decoration-none text-secondary">
+                <i class="fas fa-leaf"></i> Configurar Tipos de Ingredientes
+            </a>
+        </div>
+
     </div>
 {% endblock content %}

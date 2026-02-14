@@ -1,29 +1,214 @@
 {% extends "base.html" %}
-{% block title %}Gerenciar Pratos{% endblock %}
+{% block title %}
+    {% if editing_dish %}Editar Prato{% else %}Novo Prato{% endif %}
+{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="mb-4">{% if editing_dish %}Editar Prato: {{ editing_dish.name }}{% else %}Adicionar Novo
-            Prato{% endif %}</h2>
 
-        <form method="post"
-              action="
-                      {% if editing_dish %}{% url 'dish_update' pk=editing_dish.pk %}{% else %}{% url 'dish_create' %}{% endif %}">
-            {% csrf_token %}
+    <style>
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+        }
 
-            {{ form.as_p }}
+        .form-header {
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
 
-            {% if editing_dish %}
-                <button type="submit" class="btn btn-primary">Atualizar Prato</button>
-                <a href="{% url 'dish_list' %}" class="btn btn-secondary">Cancelar Edição</a>
-            {% else %}
-                <button type="submit" class="btn btn-primary">Cadastrar Prato</button>
-            {% endif %}
-        </form>
+        .form-label-custom {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--sidebar-bg);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
 
-        <hr>
-        {% if editing_dish %}
-            <a href="{% url 'dish_list' %}" class="btn btn-outline-primary mt-3">Voltar para a Lista</a>
-        {% endif %}
+        .ingredients-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .custom-check-label {
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #555;
+            transition: color 0.2s;
+        }
+
+        .form-check-input:checked + .custom-check-label {
+            color: var(--sidebar-bg);
+            font-weight: 600;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--sidebar-bg);
+            border-color: var(--sidebar-bg);
+        }
+
+        .btn-submit-custom {
+            background-color: var(--accent-yellow);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 0.8rem 2rem;
+            transition: all 0.2s;
+        }
+
+        .btn-submit-custom:hover {
+            background-color: #e0ac46;
+            transform: translateY(-1px);
+        }
+    </style>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <div class="dashboard-card p-4 p-md-5">
+
+                    <div class="form-header d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white"
+                             style="width: 50px; height: 50px; background-color: var(--sidebar-bg);">
+                            <i class="fas fa-utensils fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="h4 mb-0 fw-bold" style="color: var(--sidebar-bg);">
+                                {% if editing_dish %}
+                                    Editar Prato
+                                {% else %}
+                                    Cadastrar Novo Prato
+                                {% endif %}
+                            </h2>
+                            <p class="text-muted small mb-0">Preencha as informações do menu abaixo</p>
+                        </div>
+                    </div>
+
+                    <form method="post" action="
+                            {% if editing_dish %}{% url 'dish_update' pk=editing_dish.pk %}{% else %}{% url 'dish_create' %}{% endif %}">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger d-flex align-items-center mb-4">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <div>{{ form.non_field_errors }}</div>
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-4 mb-4">
+                            {% for field in form %}
+                                {% if field.name != 'ingredients' and field.name != 'description' and field.name != 'descricao' %}
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                        </label>
+
+                                        <div class="input-group">
+                                        <span class="input-group-text bg-white text-muted border-end-0">
+                                            {% if 'price' in field.name %}R${% elif 'cooks' in field.name %}
+                                                <i class="fas fa-users"></i>{% else %}
+                                                <i class="fas fa-pen"></i>{% endif %}
+                                        </span>
+                                            {{ field }}
+                                        </div>
+
+                                        {% if field.help_text %}
+                                            <div class="form-text small">{{ field.help_text }}</div>
+                                        {% endif %}
+
+                                        {% if field.errors %}
+                                            <div class="text-danger small mt-1 fw-bold">{{ field.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="form-label-custom d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-carrot me-1 text-warning"></i> Seleção de Ingredientes</span>
+                                <small class="text-muted fw-normal text-lowercase">(Marque os itens que compõem o
+                                    prato)</small>
+                            </label>
+
+                            <div class="ingredients-box">
+                                {% if ingredients %}
+                                    <div class="row g-3">
+                                        {% for ingredient in ingredients %}
+                                            <div class="col-sm-6 col-md-4 col-xl-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           name="ingredients"
+                                                           value="{{ ingredient.id }}"
+                                                           id="ing_{{ ingredient.id }}"
+                                                           {% if editing_dish and ingredient in editing_dish.ingredients.all %}checked{% endif %}>
+
+                                                    <label class="form-check-label custom-check-label text-truncate w-100"
+                                                           for="ing_{{ ingredient.id }}"
+                                                           title="{{ ingredient.name }}">
+                                                        {{ ingredient.name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-4 text-muted">
+                                        <i class="fas fa-basket-shopping mb-2 opacity-50"></i>
+                                        <p class="mb-0">Nenhum ingrediente cadastrado no sistema.</p>
+                                        <a href="{% url 'ingredient_list' %}" class="small text-primary">Cadastrar
+                                            ingredientes agora</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 pt-3 border-top">
+                            <button type="submit" class="btn btn-submit-custom rounded-pill shadow-sm">
+                                {% if editing_dish %}
+                                    <i class="fas fa-save me-2"></i>Atualizar Prato
+                                {% else %}
+                                    <i class="fas fa-check me-2"></i>Cadastrar Prato
+                                {% endif %}
+                            </button>
+
+                            <a href="{% url 'dish_list' %}" class="btn btn-link text-secondary text-decoration-none">
+                                Cancelar
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var inputs = document.querySelectorAll('input:not([type="checkbox"]):not([type="hidden"]), select, textarea');
+
+            inputs.forEach(function (input) {
+                input.classList.add('form-control');
+                input.classList.add('border-start-0');
+                input.classList.add('bg-light');
+                input.style.borderLeft = 'none';
+            });
+
+            var selects = document.querySelectorAll('select[multiple]');
+            selects.forEach(function (select) {
+                select.style.height = '100px';
+            });
+        });
+    </script>
+
 {% endblock content %}

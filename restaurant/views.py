@@ -1,6 +1,8 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import DishType, Cook, Dish, Ingredient
+
 from .forms import DishTypeForm, CookForm, IngredientForm, DishForm
+from .models import DishType, Cook, Dish, Ingredient
 
 
 def dish_detail(request, pk):
@@ -67,12 +69,21 @@ def dish_type_delete(request, pk):
 
 
 def home(request):
-    return redirect('dish_type_list')
+    return redirect('dish_list')
 
 
 def cook_list(request):
     cooks = Cook.objects.all()
-    context = {'cooks': cooks}
+    search_query = request.GET.get('search', '')
+    if search_query:
+        cooks = cooks.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    context = {
+        'cooks': cooks,
+        'search_query': search_query,
+    }
     return render(request, 'restaurant/cook_list.html', context)
 
 
@@ -172,8 +183,31 @@ def ingredient_delete(request, pk):
 
 
 def dish_list(request):
-    dishes = Dish.objects.all()
-    context = {'dishes': dishes}
+    dishes = Dish.objects.select_related('dish_type').prefetch_related('cooks', 'ingredients').all()
+    dish_types = DishType.objects.all()
+    search_query = request.GET.get('search', '')
+    category_id = request.GET.get('category', '')
+    sort_by = request.GET.get('sort', '')
+
+    if search_query:
+        dishes = dishes.filter(name__icontains=search_query)
+
+    if category_id:
+        dishes = dishes.filter(dish_type__id=category_id)
+
+    if sort_by == 'asc':
+        dishes = dishes.order_by('price')
+    elif sort_by == 'desc':
+        dishes = dishes.order_by('-price')
+
+    context = {
+        'dishes': dishes,
+        'dish_types': dish_types,
+        'search_query': search_query,
+        'selected_category': int(category_id) if category_id and category_id.isdigit() else '',
+        'selected_sort': sort_by,
+    }
+
     return render(request, 'restaurant/dish_list.html', context)
 
 
@@ -182,18 +216,23 @@ def dish_create(request):
         form = DishForm(request.POST)
         if form.is_valid():
             dish_instance = form.save()
-            cook_ids = form.cleaned_data.get('cooks')
-            dish_instance.cooks.set(cook_ids)
+            ingredient_ids = form.cleaned_data.get('ingredients')
+            if ingredient_ids:
+                dish_instance.ingredients.set(ingredient_ids)
+
             return redirect('dish_list')
     else:
         form = DishForm()
 
     dish_types = DishType.objects.all()
     cooks = Cook.objects.all()
+    ingredients = Ingredient.objects.all()
+
     context = {
         'form': form,
         'dish_types': dish_types,
         'cooks': cooks,
+        'ingredients': ingredients,
         'editing_dish': None
     }
     return render(request, 'restaurant/manage_dishes.html', context)
@@ -205,18 +244,28 @@ def dish_update(request, pk):
         form = DishForm(request.POST, instance=dish_instance)
         if form.is_valid():
             dish_instance = form.save()
+
             cook_ids = form.cleaned_data.get('cooks')
-            dish_instance.cooks.set(cook_ids)
+            if cook_ids:
+                dish_instance.cooks.set(cook_ids)
+
+            ingredient_ids = form.cleaned_data.get('ingredients')
+            if ingredient_ids:
+                dish_instance.ingredientes.set(ingredient_ids)
+
             return redirect('dish_list')
     else:
         form = DishForm(instance=dish_instance)
 
     dish_types = DishType.objects.all()
     cooks = Cook.objects.all()
+    ingredients = Ingredient.objects.all()
+
     context = {
         'form': form,
         'dish_types': dish_types,
         'cooks': cooks,
+        'ingredients': ingredients,
         'editing_dish': dish_instance
     }
     return render(request, 'restaurant/manage_dishes.html', context)

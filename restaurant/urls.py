@@ -1,8 +1,16 @@
 from django.urls import path
+
 from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+
+    # Dish
+    path('dishes/', views.dish_list, name='dish_list'),
+    path('dishes/create/', views.dish_create, name='dish_create'),
+    path('dishes/update/<int:pk>/', views.dish_update, name='dish_update'),
+    path('dishes/delete/<int:pk>/', views.dish_delete, name='dish_delete'),
+    path('dishes/<int:pk>/', views.dish_detail, name='dish_detail'),
 
     # DishType
     path('dishtype/list/', views.dish_type_list, name='dish_type_list'),
@@ -22,11 +30,4 @@ urlpatterns = [
     path('ingredients/create/', views.ingredient_create, name='ingredient_create'),
     path('ingredients/update/<int:pk>/', views.ingredient_update, name='ingredient_update'),
     path('ingredients/delete/<int:pk>/', views.ingredient_delete, name='ingredient_delete'),
-
-    # Dish
-    path('dishes/', views.dish_list, name='dish_list'),
-    path('dishes/create/', views.dish_create, name='dish_create'),
-    path('dishes/update/<int:pk>/', views.dish_update, name='dish_update'),
-    path('dishes/delete/<int:pk>/', views.dish_delete, name='dish_delete'),
-    path('dishes/<int:pk>/', views.dish_detail, name='dish_detail'),
 ]

@@ -2,60 +2,190 @@
 {% block title %}Gerenciar Ingredientes{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="mb-4">{% if editing_ingredient %}Editar Ingrediente{% else %}Adicionar Novo
-            Ingrediente{% endif %}</h2>
 
-        <form method="post"
-              action="
-                      {% if editing_ingredient %}{% url 'ingredient_update' pk=editing_ingredient.pk %}{% else %}{% url 'ingredient_create' %}{% endif %}">
-            {% csrf_token %}
+    <style>
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+        }
 
-            {{ form.as_p }}
+        .table-custom thead th {
+            background-color: var(--sidebar-bg); /* Azul Escuro do Menu */
+            color: white;
+            font-weight: 500;
+            border: none;
+            padding: 1rem;
+        }
 
-            {% if editing_ingredient %}
-                <button type="submit" class="btn btn-primary">Atualizar</button>
-                <a href="{% url 'ingredient_list' %}" class="btn btn-secondary">Cancelar Edição</a>
-            {% else %}
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
-            {% endif %}
-        </form>
+        .table-custom tbody td {
+            vertical-align: middle;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
 
-        <hr>
+        .btn-action {
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            transition: color 0.2s;
+            padding: 0.2rem 0.5rem;
+        }
 
-        <h3 class="mt-5">Ingredientes Cadastrados</h3>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Ações</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for ingredient in ingredients %}
-                <tr>
-                    <td>{{ ingredient.id }}</td>
-                    <td>{{ ingredient.name }}</td>
-                    <td>
-                        <a href="{% url 'ingredient_update' pk=ingredient.id %}"
-                           class="btn btn-sm btn-warning">Editar</a>
-                        <form method="POST" action="{% url 'ingredient_delete' pk=ingredient.id %}"
-                              style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Tem certeza que deseja deletar {{ ingredient.name }}?');">
-                                Deletar
+        .btn-action:hover {
+            color: var(--accent-yellow);
+        }
+
+        .btn-action.delete:hover {
+            color: #dc3545;
+        }
+
+        .btn-submit-custom {
+            background-color: var(--accent-yellow);
+            color: #000; /* Texto escuro para contraste no amarelo */
+            font-weight: 600;
+            border: none;
+        }
+
+        .btn-submit-custom:hover {
+            background-color: #e0ac46;
+        }
+
+        .form-label-custom {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--sidebar-bg);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+
+    <div class="container-fluid p-0">
+
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="h3 fw-bold text-dark mb-0">Ingredientes</h2>
+                <p class="text-muted small mb-0">Gerencie o estoque e insumos da cozinha</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-4">
+                <div class="dashboard-card p-4 sticky-top" style="top: 20px; z-index: 1;">
+                    <h5 class="mb-4 pb-2 border-bottom fw-bold" style="color: var(--sidebar-bg);">
+                        {% if editing_ingredient %}
+                            <i class="fas fa-pen me-2 text-warning"></i>Editar Ingrediente
+                        {% else %}
+                            <i class="fas fa-plus-circle me-2 text-warning"></i>Novo Ingrediente
+                        {% endif %}
+                    </h5>
+
+                    <form method="post" action="
+                            {% if editing_ingredient %}{% url 'ingredient_update' pk=editing_ingredient.pk %}{% else %}{% url 'ingredient_create' %}{% endif %}">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label-custom mb-1">{{ field.label }}</label>
+                                <div class="input-group">
+                                    {{ field }}
+                                </div>
+                                {% if field.help_text %}
+                                    <small class="text-muted" style="font-size: 0.75rem;">{{ field.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-submit-custom py-2 shadow-sm">
+                                {% if editing_ingredient %}SALVAR ALTERAÇÕES{% else %}ADICIONAR AO ESTOQUE{% endif %}
                             </button>
-                        </form>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="3">Nenhum ingrediente cadastrado.</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
+                            {% if editing_ingredient %}
+                                <a href="{% url 'ingredient_list' %}" class="btn btn-outline-secondary btn-sm border-0">
+                                    Cancelar Edição
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="dashboard-card overflow-hidden">
+                    <!-- Barra de Filtros / Título da Tabela -->
+                    <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-secondary">Itens Cadastrados</span>
+                        <span class="badge bg-light text-dark border">
+                        Total: {{ ingredients|length }}
+                    </span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0 table-hover">
+                            <thead>
+                            <tr>
+                                <th style="width: 15%;">ID</th>
+                                <th style="width: 65%;">Nome do Ingrediente</th>
+                                <th style="width: 20%;" class="text-center">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ingredient in ingredients %}
+                                <tr>
+                                    <td>
+                                        <span class="font-monospace text-muted small">#{{ ingredient.id }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-semibold" style="color: #333;">{{ ingredient.name }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <a href="{% url 'ingredient_update' pk=ingredient.id %}" class="btn-action"
+                                               title="Editar">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+
+                                            <form method="POST" action="{% url 'ingredient_delete' pk=ingredient.id %}"
+                                                  onsubmit="return confirm('Tem certeza que deseja remover {{ ingredient.name }} do estoque?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn-action delete" title="Excluir">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted">
+                                        <i class="fas fa-basket-shopping fa-2x mb-3 opacity-50"></i>
+                                        <p class="mb-0">Nenhum ingrediente cadastrado ainda.</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-2 bg-light border-top"></div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var inputs = document.querySelectorAll('input[type="text"], input[type="number"], select, textarea');
+            inputs.forEach(function (input) {
+                input.classList.add('form-control');
+                input.classList.add('bg-light');
+                input.style.border = "1px solid #dee2e6";
+            });
+        });
+    </script>
+
 {% endblock content %}
